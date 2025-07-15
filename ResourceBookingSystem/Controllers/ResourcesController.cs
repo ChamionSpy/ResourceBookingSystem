@@ -36,6 +36,9 @@ namespace ResourceBookingSystem.Controllers
                         (r.Location != null && r.Location.ToLower().Contains(searchString)));
                 }
 
+                // Pass search value to view to maintain state
+                ViewData["CurrentFilter"] = searchString;
+
                 var resources = await resourcesQuery.ToListAsync();
                 return View(resources);
             }
