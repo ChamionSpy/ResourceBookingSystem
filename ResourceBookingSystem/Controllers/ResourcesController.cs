@@ -34,6 +34,7 @@ namespace ResourceBookingSystem.Controllers
             }
 
             var resource = await _context.Resource
+                .Include(r => r.Bookings) // Include bookings
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (resource == null)
             {
