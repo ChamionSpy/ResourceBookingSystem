@@ -2,7 +2,33 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="container py-5">
+    <h1 class="display-4 fw-semibold mb-4">Welcome to the Internal Resource Booking System</h1>
+    <p class="lead mb-5">Easily manage and book internal resources.</p>
+
+    <div class="row justify-content-center">
+        <!-- Resources Card -->
+        <div class="col-md-4 mb-4">
+            <div class="card shadow-sm text-center h-100">
+                <div class="card-body">
+                    <i class="bi bi-building fs-1 text-primary mb-3"></i>
+                    <h5 class="card-title">View Resources</h5>
+                    <p class="card-text">View and manage resources.</p>
+                    <a asp-controller="Resources" asp-action="Index" class="btn btn-outline-primary">Go to Resources</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bookings Card -->
+        <div class="col-md-4 mb-4">
+            <div class="card shadow-sm text-center h-100">
+                <div class="card-body">
+                    <i class="bi bi-calendar-check fs-1 text-success mb-3"></i>
+                    <h5 class="card-title">View Bookings</h5>
+                    <p class="card-text">View and manage your bookings.</p>
+                    <a asp-controller="Bookings" asp-action="Index" class="btn btn-outline-success">Go to Bookings</a>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
