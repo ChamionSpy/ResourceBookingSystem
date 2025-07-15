@@ -25,7 +25,7 @@ namespace ResourceBookingSystem.Controllers
             return View(await _context.Resource.ToListAsync());
         }
 
-        // GET: Resources/Details/5
+        // GET: Resources Details
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -43,15 +43,13 @@ namespace ResourceBookingSystem.Controllers
             return View(resource);
         }
 
-        // GET: Resources/Create
+        // GET: Resources Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: Resources/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        // POST: Resources Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Resource resource)
@@ -78,7 +76,7 @@ namespace ResourceBookingSystem.Controllers
         }
 
 
-        // GET: Resources/Edit/5
+        // GET: Resources Edit
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -94,9 +92,7 @@ namespace ResourceBookingSystem.Controllers
             return View(resource);
         }
 
-        // POST: Resources/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        // POST: Resources Edit
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description,Location,Capacity,IsAvailable")] Resource resource)
@@ -129,7 +125,7 @@ namespace ResourceBookingSystem.Controllers
             return View(resource);
         }
 
-        // GET: Resources/Delete/5
+        // GET: Resources Delete
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -147,7 +143,7 @@ namespace ResourceBookingSystem.Controllers
             return View(resource);
         }
 
-        // POST: Resources/Delete/5
+        // POST: Resources Delete
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)

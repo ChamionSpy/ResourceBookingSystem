@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Elfie.Serialization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -22,11 +25,12 @@ namespace ResourceBookingSystem.Controllers
         // GET: Bookings
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Bookings.Include(b => b.Resource);
-            return View(await applicationDbContext.ToListAsync());
+            var bookings = await _context.Bookings
+                .Include(b => b.Resource)
+                .ToListAsync();
+            return View(bookings);
         }
-
-        // GET: Bookings/Details/5
+        // GET: Bookings Details
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -45,31 +49,58 @@ namespace ResourceBookingSystem.Controllers
             return View(booking);
         }
 
-        // GET: Bookings/Create
+        // GET: Bookings Create
         public IActionResult Create()
         {
-            ViewData["ResourceId"] = new SelectList(_context.Resource, "Id", "Name");
+            ViewBag.Resources = new SelectList(_context.Resource, "Id", "Name");
             return View();
         }
 
-        // POST: Bookings/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        // POST: Bookings Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,ResourceId,StartTime,EndTime,BookedBy,Purpose")] Booking booking)
+        public async Task<IActionResult> Create([Bind("ResourceId,StartTime,EndTime,BookedBy,Purpose")] Booking booking)
         {
-            if (ModelState.IsValid)
+        
+            if (booking.ResourceId == 0)
             {
-                _context.Add(booking);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                ModelState.AddModelError("ResourceId", "Please select a resource");
             }
-            ViewData["ResourceId"] = new SelectList(_context.Resource, "Id", "Name", booking.ResourceId);
-            return View(booking);
+
+            foreach (var key in Request.Form.Keys)
+            {
+                Debug.WriteLine($"{key}: {Request.Form[key]}");
+            }
+            ModelState.Remove("Resource");
+
+            if (!ModelState.IsValid)
+            {
+                // Repopulate dropdown before returning view
+                ViewBag.Resources = new SelectList(_context.Resource, "Id", "Name", booking.ResourceId);
+                return View(booking);
+            }
+
+            // Check for booking conflicts
+            bool hasConflict = await _context.Bookings
+                .AnyAsync(b => b.ResourceId == booking.ResourceId &&
+                              booking.StartTime < b.EndTime &&
+                              booking.EndTime > b.StartTime);
+
+            if (hasConflict)
+            {
+                ModelState.AddModelError("", "This resource is already booked during the selected time.");
+                ViewBag.Resources = new SelectList(_context.Resource, "Id", "Name", booking.ResourceId);
+                return View(booking);
+            }
+
+            // Save booking if valid
+            _context.Add(booking);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
         }
 
-        // GET: Bookings/Edit/5
+
+        // GET: Bookings Edit
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -86,9 +117,7 @@ namespace ResourceBookingSystem.Controllers
             return View(booking);
         }
 
-        // POST: Bookings/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        // POST: Bookings Edit
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,ResourceId,StartTime,EndTime,BookedBy,Purpose")] Booking booking)
@@ -122,7 +151,7 @@ namespace ResourceBookingSystem.Controllers
             return View(booking);
         }
 
-        // GET: Bookings/Delete/5
+        // GET: Bookings Delete
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -141,7 +170,7 @@ namespace ResourceBookingSystem.Controllers
             return View(booking);
         }
 
-        // POST: Bookings/Delete/5
+        // POST: Bookings Delete
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
