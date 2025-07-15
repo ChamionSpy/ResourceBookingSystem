@@ -7,7 +7,7 @@
 <h1 class="mb-4 text-center">Resources</h1>
 
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <a asp-action="Create" class="btn btn-primary btn-lg">
+    <a asp-action="Create" class="btn btn-success btn-lg">
         <i class="bi bi-plus-circle"></i> Add New Resource
     </a>
 </div>
@@ -23,11 +23,11 @@
             <th>
                 @Html.DisplayNameFor(model => model.Location)
             </th>
-            <th>
+            <th class="text-center">
                 @Html.DisplayNameFor(model => model.Capacity)
             </th>
             <th class="text-center">Availability</th>
-            <th></th>
+            <th>Actions</th>
         </tr>
     </thead>
     <tbody>
