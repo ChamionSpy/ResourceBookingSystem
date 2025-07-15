@@ -20,16 +20,28 @@ namespace ResourceBookingSystem.Controllers
         }
 
         // GET: Resources
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string searchString)
         {
             try
             {
-                var resources = await _context.Resource.ToListAsync();
+                IQueryable<Resource> resourcesQuery = _context.Resource;
+
+                // Apply search filter if searchString is provided
+                if (!string.IsNullOrEmpty(searchString))
+                {
+                    searchString = searchString.ToLower();
+                    resourcesQuery = resourcesQuery.Where(r =>
+                        r.Name.ToLower().Contains(searchString) ||
+                        (r.Description != null && r.Description.ToLower().Contains(searchString)) ||
+                        (r.Location != null && r.Location.ToLower().Contains(searchString)));
+                }
+
+                var resources = await resourcesQuery.ToListAsync();
                 return View(resources);
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
-                // Log and handle
+                // Log and handle errors
                 ModelState.AddModelError("", "Unable to load resources. Please try again later.");
                 System.Diagnostics.Debug.WriteLine($"Error loading resources: {ex.Message}");
                 return View(new List<Resource>());

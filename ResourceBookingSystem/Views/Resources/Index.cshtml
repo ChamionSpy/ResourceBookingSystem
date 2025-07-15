@@ -6,6 +6,23 @@
 
 <h1 class="mb-4 text-center">Resources</h1>
 
+<!-- Search Box -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <form asp-action="index" method="get">
+            <div class="input-group">
+                <input type="text" class="form-control" name="searchString" placeholder="Search by name, description or location" value="@ViewData["CurrentFilter"]" />
+                <button type="submit" class="btn btn-info">
+                    <i class="bi bi-search"></i> Search
+                </button>
+                <a asp-action="Index" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-counterclockwise"></i> Reset
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
 <div class="d-flex justify-content-between align-items-center mb-4">
     <a asp-action="Create" class="btn btn-success btn-lg">
         <i class="bi bi-plus-circle"></i> Add New Resource
