@@ -11,8 +11,11 @@ namespace ResourceBookingSystem.Models
         [Required(ErrorMessage = "Please select a resource.")]
         [Range(1, int.MaxValue, ErrorMessage = "Please select a valid resource")]
         public int? ResourceId { get; set; }
+        [Required(ErrorMessage = "Start Time is required.")]
         public DateTime StartTime { get; set; }
+        [Required(ErrorMessage = "End Time is required.")]
         public DateTime EndTime { get; set; }
+        [Required(ErrorMessage = "Booked By is required.")]
         public string BookedBy { get; set; }
 
         [Required(ErrorMessage = "Purpose is required.")]

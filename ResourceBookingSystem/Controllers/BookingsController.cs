@@ -67,6 +67,11 @@ namespace ResourceBookingSystem.Controllers
                 ModelState.AddModelError("ResourceId", "Please select a resource");
             }
 
+            if (booking.EndTime <= booking.StartTime)
+            {
+                ModelState.AddModelError("", "End time must be after start time.");
+            }
+
             foreach (var key in Request.Form.Keys)
             {
                 Debug.WriteLine($"{key}: {Request.Form[key]}");
@@ -88,7 +93,7 @@ namespace ResourceBookingSystem.Controllers
 
             if (hasConflict)
             {
-                ModelState.AddModelError("", "This resource is already booked during the selected time.");
+                ModelState.AddModelError("", "This resource is already booked during the requested time. Please choose another slot or resource, or adjust your times");
                 ViewBag.Resources = new SelectList(_context.Resource, "Id", "Name", booking.ResourceId);
                 return View(booking);
             }
@@ -113,7 +118,7 @@ namespace ResourceBookingSystem.Controllers
             {
                 return NotFound();
             }
-            ViewData["ResourceId"] = new SelectList(_context.Resource, "Id", "Name", booking.ResourceId);
+            ViewBag.Resources = new SelectList(_context.Resource, "Id", "Name", booking.ResourceId);
             return View(booking);
         }
 
@@ -127,28 +132,44 @@ namespace ResourceBookingSystem.Controllers
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            // Manual validations like in Create
+            if (booking.ResourceId == 0)
             {
-                try
-                {
-                    _context.Update(booking);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!BookingExists(booking.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+                ModelState.AddModelError("ResourceId", "Please select a resource");
             }
-            ViewData["ResourceId"] = new SelectList(_context.Resource, "Id", "Name", booking.ResourceId);
-            return View(booking);
+
+            if (booking.EndTime <= booking.StartTime)
+            {
+                ModelState.AddModelError("", "End time must be after start time.");
+            }
+
+            // Remove navigation property validation (if any)
+            ModelState.Remove("Resource");
+
+            if (!ModelState.IsValid)
+            {
+                // Repopulate dropdown before returning view
+                ViewBag.Resources = new SelectList(_context.Resource, "Id", "Name", booking.ResourceId);
+                return View(booking);
+            }
+
+            try
+            {
+                _context.Update(booking);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!BookingExists(booking.Id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: Bookings Delete
