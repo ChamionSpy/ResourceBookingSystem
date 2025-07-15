@@ -54,16 +54,29 @@ namespace ResourceBookingSystem.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Description,Location,Capacity,IsAvailable")] Resource resource)
+        public async Task<IActionResult> Create(Resource resource)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                _context.Add(resource);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                // Log all validation errors
+                foreach (var entry in ModelState)
+                {
+                    if (entry.Value.Errors.Count > 0)
+                    {
+                        System.Diagnostics.Debug.WriteLine(
+                            $"Field: {entry.Key} - Error: {entry.Value.Errors[0].ErrorMessage}");
+                    }
+                }
+
+                return View(resource); // Return view to show errors
             }
-            return View(resource);
+
+            // Proceed if valid
+            _context.Add(resource);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
         }
+
 
         // GET: Resources/Edit/5
         public async Task<IActionResult> Edit(int? id)
