@@ -25,28 +25,40 @@ namespace ResourceBookingSystem.Controllers
         // GET: Bookings
         public async Task<IActionResult> Index()
         {
-            var bookings = await _context.Bookings
-                .Include(b => b.Resource)
-                .ToListAsync();
-            return View(bookings);
+            try
+            {
+                var bookings = await _context.Bookings
+                    .Include(b => b.Resource)
+                    .ToListAsync();
+                return View(bookings);
+            }
+            catch (Exception ex)
+            {
+                // Log error (consider using a logging framework)
+                Debug.WriteLine($"Error fetching bookings: {ex.Message}");
+                return View("Error");
+            }
         }
         // GET: Bookings Details
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
-            var booking = await _context.Bookings
-                .Include(b => b.Resource)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (booking == null)
+            try
             {
-                return NotFound();
-            }
+                var booking = await _context.Bookings
+                    .Include(b => b.Resource)
+                    .FirstOrDefaultAsync(m => m.Id == id);
 
-            return View(booking);
+                if (booking == null) return NotFound();
+
+                return View(booking);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error fetching booking details: {ex.Message}");
+                return View("Error");
+            }
         }
 
         // GET: Bookings Create
@@ -61,7 +73,8 @@ namespace ResourceBookingSystem.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("ResourceId,StartTime,EndTime,BookedBy,Purpose")] Booking booking)
         {
-        
+
+            // Manual validation
             if (booking.ResourceId == 0)
             {
                 ModelState.AddModelError("ResourceId", "Please select a resource");
@@ -72,38 +85,44 @@ namespace ResourceBookingSystem.Controllers
                 ModelState.AddModelError("", "End time must be after start time.");
             }
 
-            foreach (var key in Request.Form.Keys)
-            {
-                Debug.WriteLine($"{key}: {Request.Form[key]}");
-            }
             ModelState.Remove("Resource");
 
             if (!ModelState.IsValid)
             {
-                // Repopulate dropdown before returning view
+                // Repopulate resources dropdown before returning view
                 ViewBag.Resources = new SelectList(_context.Resource, "Id", "Name", booking.ResourceId);
                 return View(booking);
             }
 
-            // Check for booking conflicts
-            bool hasConflict = await _context.Bookings
-                .AnyAsync(b => b.ResourceId == booking.ResourceId &&
-                              booking.StartTime < b.EndTime &&
-                              booking.EndTime > b.StartTime);
-
-            if (hasConflict)
+            try
             {
-                ModelState.AddModelError("", "This resource is already booked during the requested time. Please choose another slot or resource, or adjust your times");
+                // Check for booking conflicts
+                bool hasConflict = await _context.Bookings
+                    .AnyAsync(b => b.ResourceId == booking.ResourceId &&
+                                  booking.StartTime < b.EndTime &&
+                                  booking.EndTime > b.StartTime);
+
+                if (hasConflict)
+                {
+                    ModelState.AddModelError("", "This resource is already booked during the requested time. Please choose another slot or resource, or adjust your times");
+                    ViewBag.Resources = new SelectList(_context.Resource, "Id", "Name", booking.ResourceId);
+                    return View(booking);
+                }
+
+                // Save booking if valid
+                _context.Add(booking);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error creating booking: {ex.Message}");
+                ModelState.AddModelError("", "An error occurred while saving the booking.");
                 ViewBag.Resources = new SelectList(_context.Resource, "Id", "Name", booking.ResourceId);
                 return View(booking);
             }
 
-            // Save booking if valid
-            _context.Add(booking);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
         }
-
 
         // GET: Bookings Edit
         public async Task<IActionResult> Edit(int? id)
@@ -113,13 +132,22 @@ namespace ResourceBookingSystem.Controllers
                 return NotFound();
             }
 
-            var booking = await _context.Bookings.FindAsync(id);
-            if (booking == null)
+            try
             {
-                return NotFound();
+                var booking = await _context.Bookings.FindAsync(id);
+                if (booking == null)
+                {
+                    return NotFound();
+                }
+                ViewBag.Resources = new SelectList(_context.Resource, "Id", "Name", booking.ResourceId);
+                return View(booking);
             }
-            ViewBag.Resources = new SelectList(_context.Resource, "Id", "Name", booking.ResourceId);
-            return View(booking);
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error loading edit form: {ex.Message}");
+                return View("Error");
+            }
+
         }
 
         // POST: Bookings Edit
@@ -180,15 +208,21 @@ namespace ResourceBookingSystem.Controllers
                 return NotFound();
             }
 
-            var booking = await _context.Bookings
-                .Include(b => b.Resource)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (booking == null)
+            try
             {
-                return NotFound();
-            }
+                var booking = await _context.Bookings
+                    .Include(b => b.Resource)
+                    .FirstOrDefaultAsync(m => m.Id == id);
 
-            return View(booking);
+                if (booking == null) return NotFound();
+
+                return View(booking);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error loading delete view: {ex.Message}");
+                return View("Error");
+            }
         }
 
         // POST: Bookings Delete
@@ -196,14 +230,22 @@ namespace ResourceBookingSystem.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var booking = await _context.Bookings.FindAsync(id);
-            if (booking != null)
+            try
             {
-                _context.Bookings.Remove(booking);
-            }
+                var booking = await _context.Bookings.FindAsync(id);
+                if (booking != null)
+                {
+                    _context.Bookings.Remove(booking);
+                }
 
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error deleting booking: {ex.Message}");
+                return View("Error");
+            }
         }
 
         private bool BookingExists(int id)
