@@ -44,8 +44,15 @@
 </div>
 <hr />
 
-<h4>Existing Bookings</h4>
-@if (Model.Bookings != null && Model.Bookings.Any())
+<h4>Upcoming Bookings</h4>
+@{
+    var upcomingBookings = Model.Bookings?
+        .Where(b => b.EndTime > DateTime.Now)
+        .OrderBy(b => b.StartTime)
+        .ToList();
+}
+
+@if (upcomingBookings != null && upcomingBookings.Any())
 {
     <table class="table table-bordered">
         <thead>
@@ -57,7 +64,7 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (var booking in Model.Bookings.OrderBy(b => b.StartTime))
+            @foreach (var booking in upcomingBookings)
             {
                 <tr>
                     <td>@booking.StartTime.ToString("g")</td>
@@ -71,8 +78,9 @@
 }
 else
 {
-    <p>No bookings for this resource.</p>
+    <p>No upcoming bookings for this resource.</p>
 }
+
 
 <hr />
 <div>
