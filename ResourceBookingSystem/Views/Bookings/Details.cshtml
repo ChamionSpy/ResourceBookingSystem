@@ -14,13 +14,13 @@
             @Html.DisplayNameFor(model => model.StartTime)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.StartTime)
+            @Model.StartTime.ToString("dd MMMM yyyy, h:mm tt")
         </dd>
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.EndTime)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.EndTime)
+            @Model.EndTime.ToString("dd MMMM yyyy, h:mm tt")
         </dd>
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.BookedBy)

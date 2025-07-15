@@ -1,12 +1,12 @@
 ﻿@model ResourceBookingSystem.Models.Resource
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Resource Details";
 }
 
-<h1>Details</h1>
+<h1 class="mb-4 text-center">Resource Details</h1>
 
-<div>
+<div class="row justify-content-center">
     <h4>Resource</h4>
     <hr />
     <dl class="row">
@@ -38,11 +38,24 @@
             @Html.DisplayNameFor(model => model.IsAvailable)
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.IsAvailable)
+            <span class="fw-bold @(Model.IsAvailable ? "text-success" : "text-dark")">
+                @(Model.IsAvailable ? "Available" : "Not Available")
+            </span>
         </dd>
+
     </dl>
 </div>
 <hr />
+
+<div class="mb-3">
+    <a asp-action="Edit" asp-route-id="@Model?.Id" class="btn btn-primary me-2">
+        <i class="bi bi-pencil-square"></i> Edit
+    </a>
+    <a asp-action="Index" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i> Back to Resource List
+    </a>
+</div>
+
 
 <h4>Upcoming Bookings</h4>
 @{
@@ -83,7 +96,3 @@ else
 
 
 <hr />
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
-</div>

@@ -1,15 +1,13 @@
 ﻿@model ResourceBookingSystem.Models.Resource
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Add New Resource";
 }
 
-<h1>Create</h1>
+<h1 class ="mb-4 text-center">Add New Resource</h1>
 
-<h4>Resource</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
+<div class="row justify-content-center">
+    <div class="col-md-6">
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
@@ -32,20 +30,20 @@
                 <input asp-for="Capacity" class="form-control" />
                 <span asp-validation-for="Capacity" class="text-danger"></span>
             </div>
-            <div class="form-group form-check">
+            <div class="form-group form-check mt-4">
                 <label class="form-check-label">
-                    <input class="form-check-input" asp-for="IsAvailable" /> @Html.DisplayNameFor(model => model.IsAvailable)
+                    <input class="form-check-input" asp-for="IsAvailable" /> is available
                 </label>
             </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+            <div class="form-group mt-4">
+                <input type="submit" value="Save" class="btn btn-success btn-lg" />
             </div>
         </form>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
+<div class="mt-4 text-center">
+    <a asp-action="Index">Back to Resources List</a>
 </div>
 
 @section Scripts {
