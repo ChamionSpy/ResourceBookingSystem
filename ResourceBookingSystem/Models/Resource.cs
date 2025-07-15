@@ -14,5 +14,8 @@ namespace ResourceBookingSystem.Models
         [Range(1, int.MaxValue, ErrorMessage = "Capacity must be greater than 0")]
         public int Capacity { get; set; }
         public bool IsAvailable { get; set; }
+
+        // A resource can have many bookings
+        public ICollection<Booking> Bookings { get; set; }
     }
 }

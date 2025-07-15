@@ -10,5 +10,6 @@ namespace ResourceBookingSystem.Data
         {
         }
         public DbSet<Resource> Resource { get; set; }
+        public DbSet<Booking> Bookings { get; set; }
     }
 }

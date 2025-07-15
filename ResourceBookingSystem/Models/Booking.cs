@@ -8,5 +8,11 @@
         public DateTime EndTime { get; set; }
         public string BookedBy { get; set; }
         public string Purpose { get; set; }
+
+        // This points to the resource beign booked
+        public int ResourceID { get; set; }
+
+        // This lets us get the full resource details from a booking
+        public Resource Resource { get; set; }
     }
 }
