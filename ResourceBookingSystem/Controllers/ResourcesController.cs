@@ -22,7 +22,18 @@ namespace ResourceBookingSystem.Controllers
         // GET: Resources
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Resource.ToListAsync());
+            try
+            {
+                var resources = await _context.Resource.ToListAsync();
+                return View(resources);
+            }
+            catch (Exception ex) 
+            {
+                // Log and handle
+                ModelState.AddModelError("", "Unable to load resources. Please try again later.");
+                System.Diagnostics.Debug.WriteLine($"Error loading resources: {ex.Message}");
+                return View(new List<Resource>());
+            }
         }
 
         // GET: Resources Details
@@ -33,15 +44,26 @@ namespace ResourceBookingSystem.Controllers
                 return NotFound();
             }
 
-            var resource = await _context.Resource
-                .Include(r => r.Bookings) // Include bookings
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (resource == null)
+            try
             {
-                return NotFound();
+                var resource = await _context.Resource
+                .Include(r => r.Bookings) // Include bookings for this resource
+                .FirstOrDefaultAsync(m => m.Id == id);
+                if (resource == null)
+                {
+                    return NotFound();
+                }
+
+                return View(resource);
+            }
+            catch (Exception ex)
+            {
+                // Log and handle
+                ModelState.AddModelError("", "Unable to load resource details.");
+                System.Diagnostics.Debug.WriteLine($"Error fetching details: {ex.Message}");
+                return RedirectToAction(nameof(Index));
             }
 
-            return View(resource);
         }
 
         // GET: Resources Create
@@ -62,18 +84,26 @@ namespace ResourceBookingSystem.Controllers
                 {
                     if (entry.Value.Errors.Count > 0)
                     {
-                        System.Diagnostics.Debug.WriteLine(
-                            $"Field: {entry.Key} - Error: {entry.Value.Errors[0].ErrorMessage}");
+                        System.Diagnostics.Debug.WriteLine($"Field: {entry.Key} - Error: {entry.Value.Errors[0].ErrorMessage}");
                     }
                 }
 
                 return View(resource); // Return view to show errors
             }
 
-            // Proceed if valid
-            _context.Add(resource);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            try
+            {
+                // Proceed if valid
+                _context.Add(resource);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", "Failed to create resource. Please try again.");
+                System.Diagnostics.Debug.WriteLine($"Create error: {ex.Message}");
+                return View(resource);
+            }
         }
 
 
@@ -85,12 +115,22 @@ namespace ResourceBookingSystem.Controllers
                 return NotFound();
             }
 
-            var resource = await _context.Resource.FindAsync(id);
-            if (resource == null)
+            try
             {
-                return NotFound();
+                var resource = await _context.Resource.FindAsync(id);
+                if (resource == null)
+                {
+                    return NotFound();
+                }
+                return View(resource);
             }
-            return View(resource);
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", "Failed to load resource for editing.");
+                System.Diagnostics.Debug.WriteLine($"Edit GET error: {ex.Message}");
+                return RedirectToAction(nameof(Index));
+            }
+
         }
 
         // POST: Resources Edit
@@ -98,32 +138,29 @@ namespace ResourceBookingSystem.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description,Location,Capacity,IsAvailable")] Resource resource)
         {
-            if (id != resource.Id)
-            {
-                return NotFound();
-            }
+            if (id != resource.Id) return NotFound();
 
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid) return View(resource);
+
+            try
             {
-                try
-                {
-                    _context.Update(resource);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!ResourceExists(resource.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
+                _context.Update(resource);
+                await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(resource);
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!ResourceExists(resource.Id))
+                    return NotFound();
+                else
+                    throw;
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", "Failed to update resource.");
+                System.Diagnostics.Debug.WriteLine($"Edit POST error: {ex.Message}");
+                return View(resource);
+            }
         }
 
         // GET: Resources Delete
@@ -134,14 +171,19 @@ namespace ResourceBookingSystem.Controllers
                 return NotFound();
             }
 
-            var resource = await _context.Resource
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (resource == null)
+            try
             {
-                return NotFound();
-            }
+                var resource = await _context.Resource.FirstOrDefaultAsync(m => m.Id == id);
+                if (resource == null) return NotFound();
 
-            return View(resource);
+                return View(resource);
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", "Failed to load resource for deletion.");
+                System.Diagnostics.Debug.WriteLine($"Delete GET error: {ex.Message}");
+                return RedirectToAction(nameof(Index));
+            }
         }
 
         // POST: Resources Delete
@@ -149,14 +191,23 @@ namespace ResourceBookingSystem.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var resource = await _context.Resource.FindAsync(id);
-            if (resource != null)
+            try
             {
-                _context.Resource.Remove(resource);
-            }
+                var resource = await _context.Resource.FindAsync(id);
+                if (resource != null)
+                {
+                    _context.Resource.Remove(resource);
+                    await _context.SaveChangesAsync();
+                }
 
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", "Failed to delete resource.");
+                System.Diagnostics.Debug.WriteLine($"Delete POST error: {ex.Message}");
+                return RedirectToAction(nameof(Delete), new { id });
+            }
         }
 
         private bool ResourceExists(int id)

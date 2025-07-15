@@ -52,21 +52,4 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const resourceDropdown = document.querySelector('select[name="ResourceId"]');
-            if (resourceDropdown) {
-                // Log the initial value
-                console.log("Initial ResourceId:", resourceDropdown.value);
-
-                // Log every time the selection changes
-                resourceDropdown.addEventListener("change", function () {
-                    console.log("Selected ResourceId:", this.value);
-                });
-            } else {
-                console.warn("ResourceId dropdown not found.");
-            }
-        });
-    </script>
 }
