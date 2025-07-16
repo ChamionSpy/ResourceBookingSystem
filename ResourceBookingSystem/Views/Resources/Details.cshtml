@@ -80,8 +80,8 @@
             @foreach (var booking in upcomingBookings)
             {
                 <tr>
-                    <td>@booking.StartTime.ToString("g")</td>
-                    <td>@booking.EndTime.ToString("g")</td>
+                    <td>@booking.StartTime.ToString("dd MMMM yyyy, h:mm tt")</td>
+                    <td>@booking.EndTime.ToString("dd MMMM yyyy, h:mm tt")</td>
                     <td>@booking.BookedBy</td>
                     <td>@booking.Purpose</td>
                 </tr>
