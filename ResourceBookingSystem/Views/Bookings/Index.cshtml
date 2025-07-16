@@ -2,7 +2,23 @@
 
 @{
     ViewData["Title"] = "Bookings";
+    var bookingDate = ViewData["BookingDate"]?.ToString();
 }
+
+<form asp-action="Index" method="get" class="row mb-4">
+    <div class="col-md-3">
+        <label class="form-label">Booking Date</label>
+        <input type="date" name="bookingDate" class="form-control" value="@bookingDate" />
+    </div>
+    <div class="col-md-3 align-self-end">
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-funnel"></i> Filter
+        </button>
+        <a asp-action="Index" class="btn btn-outline-secondary ms-2">
+            <i class="bi bi-x-circle"></i> Reset
+        </a>
+    </div>
+</form>
 
 <h1 class ="text-center mb-4">Bookings</h1>
 

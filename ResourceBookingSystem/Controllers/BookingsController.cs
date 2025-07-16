@@ -23,13 +23,24 @@ namespace ResourceBookingSystem.Controllers
         }
 
         // GET: Bookings
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(DateTime? bookingDate)
         {
             try
             {
-                var bookings = await _context.Bookings
+                var bookingsQuery = _context.Bookings
                     .Include(b => b.Resource)
-                    .ToListAsync();
+                    .AsQueryable();
+
+                if (bookingDate.HasValue)
+                {
+                    var selectedDate = bookingDate.Value.Date;
+                    bookingsQuery = bookingsQuery.Where(b =>
+                    b.StartTime.Date <= selectedDate && b.EndTime.Date >= selectedDate);
+                }
+
+                ViewData["BookingDate"] = bookingDate?.ToString("yyyy-MM-dd");
+
+                var bookings = await bookingsQuery.ToListAsync();
                 return View(bookings);
             }
             catch (Exception ex)
