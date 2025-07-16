@@ -14,6 +14,9 @@
     <header>
         <nav class="navbar navbar-expand-sm navbar-light bg-light">
             <div class="container">
+                <!-- 'asp-controller' tells ASP.NET Core which controller this link should go to -->
+                <!-- 'asp-action' tells it which method (action) inside that controller to call -->
+
                 <a class="navbar-brand text-success mb-2" asp-controller="Home" asp-action="Index">Internal Resource Booking System</a>
                 <div class="d-flex justify-content-center">
                     <div class="navbar-nav d-flex flex-row gap-3">
@@ -27,6 +30,7 @@
     </header>
     <div class="container">
         <main role="main" class="pb-3">
+            <!-- tells ASP.NET to insert the content of the specific view here -->
             @RenderBody()
         </main>
     </div>
@@ -43,6 +47,8 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <!-- This lets individual pages optionally add custom scripts (like JavaScript) to the layout -->
+    <!-- 'required: false' means it's optional – pages don't have to include a 'Scripts' section -->
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

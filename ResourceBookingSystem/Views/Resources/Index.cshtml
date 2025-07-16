@@ -1,7 +1,10 @@
 ﻿@model IEnumerable<ResourceBookingSystem.Models.Resource>
 
 @{
+    // Set the page title to "Resources" (used in layout/title disp
     ViewData["Title"] = "Resources";
+    // Get the selected availability filter value from ViewData
+    // (it might be "true", "false", or null if no filter was chosen)
     var selectedAvailability = ViewData["IsAvailable"]?.ToString();
 }
 
@@ -64,6 +67,7 @@
     <thead class="table-dark">
         <tr>
             <th>
+                <!-- Show the label for the 'Name' property, using [Display(Name = "...")] if provided -->
                 @Html.DisplayNameFor(model => model.Name)
             </th>
             <th>

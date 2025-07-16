@@ -18,8 +18,11 @@ namespace ResourceBookingSystem.Models
         public int Capacity { get; set; }
         public bool IsAvailable { get; set; } = true;
 
-        // A resource can have many bookings
+        // The [ValidateNever] attribute is used to prevent this property from being validated during resource form submission.
         [ValidateNever]
+        // This declares a property called Bookings in the Resource class.
+        // It holds a collection (list) of Booking objects related to that resource.
+        // The type ICollection<Booking> means it can hold multiple bookings.
         public ICollection<Booking> Bookings { get; set; }
     }
 }
