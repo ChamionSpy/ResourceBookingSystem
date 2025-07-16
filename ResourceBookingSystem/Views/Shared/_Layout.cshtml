@@ -14,10 +14,13 @@
     <header>
         <nav class="navbar navbar-expand-sm navbar-light bg-light">
             <div class="container">
-                <a class="navbar-brand" asp-controller="Home" asp-action="Index">Internal Resource Booking System</a>
-                <div class="navbar-nav">
-                    <a class="nav-link" asp-controller="Resources" asp-action="Index">Resources</a>
-                    <a class="nav-link" asp-controller="Bookings" asp-action="Index">Bookings</a>
+                <a class="navbar-brand text-success mb-2" asp-controller="Home" asp-action="Index">Internal Resource Booking System</a>
+                <div class="d-flex justify-content-center">
+                    <div class="navbar-nav d-flex flex-row gap-3">
+                        <a class="nav-link text-dark" asp-controller="Resources" asp-action="Index">Resources</a>
+                        <a class="nav-link text-dark" asp-controller="Bookings" asp-action="Index">Bookings</a>
+                        <a class="nav-link text-dark" asp-controller="Bookings" asp-action="Dashboard">Dashboard</a>
+                    </div>
                 </div>
             </div>
         </nav>

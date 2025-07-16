@@ -248,6 +248,54 @@ namespace ResourceBookingSystem.Controllers
             }
         }
 
+        public async Task<IActionResult> Dashboard(int? year, int? month)
+        {
+            try
+            {
+                var currentDate = DateTime.Now;
+                var viewModel = new CalenderViewModel
+                {
+                    Year = year ?? currentDate.Year,
+                    Month = month ?? currentDate.Month,
+                };
+
+                // Get all bookings for the month
+                var firstDayOfMonth = new DateTime(viewModel.Year, viewModel.Month, 1);
+                var lastDayOfMonth = firstDayOfMonth.AddMonths(1).AddDays(-1);
+
+                var bookings = await _context.Bookings
+                    .Include(b => b.Resource)
+                    .Where(b => b.StartTime >= firstDayOfMonth && b.EndTime <= lastDayOfMonth)
+                    .ToListAsync();
+
+                // Populate calendar days
+                for (var date = firstDayOfMonth; date <= lastDayOfMonth; date = date.AddDays (1))
+                {
+                    var day = new CalendarDay { Date = date };
+                    var dailyBookings = bookings.Where(b => b.StartTime.Date <= date.Date && b.EndTime.Date >= date);
+
+                    foreach (var booking in dailyBookings)
+                    {
+                        day.Bookings.Add(new BookingInfo
+                        {
+                            ResourceName = booking.Resource?.Name ?? "Unknown",
+                            TimeRange = $"{booking.StartTime:HH:mm} - {booking.EndTime:HH:mm}",
+                            BookedBy = booking.BookedBy
+                        });
+                    }
+                    viewModel.Days.Add(day);
+                }
+
+                return View(viewModel);
+            }
+            catch (Exception ex)
+            {
+                // Log error
+                Debug.WriteLine($"Error loading calendar: {ex.Message}");
+                return View("Error");
+            }
+        }
+
         private bool BookingExists(int id)
         {
             return _context.Bookings.Any(e => e.Id == id);
