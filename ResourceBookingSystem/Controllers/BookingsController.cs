@@ -330,7 +330,8 @@ namespace ResourceBookingSystem.Controllers
                         {
                             // Set resource name, time range, and booked by info
                             ResourceName = booking.Resource?.Name ?? "Unknown",
-                            TimeRange = $"{booking.StartTime:HH:mm} - {booking.EndTime:HH:mm}",
+                            StartTime = booking.StartTime, 
+                            EndTime = booking.EndTime,
                             BookedBy = booking.BookedBy
                         });
                     }

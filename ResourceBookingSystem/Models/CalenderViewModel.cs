@@ -20,7 +20,8 @@
     public class BookingInfo
     {
         public string ResourceName { get; set; }
-        public string TimeRange { get; set; }
+        public DateTime StartTime { get; set; } 
+        public DateTime EndTime { get; set; }
         public string BookedBy { get; set; }
     }
 }

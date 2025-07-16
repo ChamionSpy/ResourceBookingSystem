@@ -44,7 +44,7 @@
                         {
                             <div class="booking-item">
                                 <strong>@booking.ResourceName</strong><br>
-                                @booking.TimeRange<br>
+                                @($"{booking.StartTime:MMM dd HH:mm} - {booking.EndTime:MMM dd HH:mm}")<br>
                                 <em>Booked by: @booking.BookedBy</em>
                             </div>
                         }
