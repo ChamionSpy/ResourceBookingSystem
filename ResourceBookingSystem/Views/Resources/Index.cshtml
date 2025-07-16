@@ -2,16 +2,48 @@
 
 @{
     ViewData["Title"] = "Resources";
+    var selectedAvailability = ViewData["IsAvailable"]?.ToString();
 }
 
 <h1 class="mb-4 text-center">Resources</h1>
 
 <!-- Search Box -->
 <div class="row mb-4">
-    <div class="col-md-6">
+    <div class="col-md-8">
         <form asp-action="index" method="get">
             <div class="input-group">
                 <input type="text" class="form-control" name="searchString" placeholder="Search by name, description or location" value="@ViewData["CurrentFilter"]" />
+
+                <select class="form-select" name="isAvailable">
+                    @if (string.IsNullOrEmpty(selectedAvailability))
+                    {
+                        <option value="" selected>All</option>
+                    }
+                    else
+                    {
+                        <option value="">All</option>
+                    }
+
+                    @if (selectedAvailability == "True")
+                    {
+                        <option value="true" selected>Available</option>
+                    }
+                    else
+                    {
+                        <option value="true">Available</option>
+                    }
+
+                    @if (selectedAvailability == "False")
+                    {
+                        <option value="false" selected>Not Available</option>
+                    }
+                    else
+                    {
+                        <option value="false">Not Available</option>
+                    }
+                </select>
+
+
                 <button type="submit" class="btn btn-info">
                     <i class="bi bi-search"></i> Search
                 </button>

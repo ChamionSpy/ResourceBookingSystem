@@ -20,7 +20,7 @@ namespace ResourceBookingSystem.Controllers
         }
 
         // GET: Resources
-        public async Task<IActionResult> Index(string searchString)
+        public async Task<IActionResult> Index(string searchString, bool? isAvailable)
         {
             try
             {
@@ -36,8 +36,15 @@ namespace ResourceBookingSystem.Controllers
                         (r.Location != null && r.Location.ToLower().Contains(searchString)));
                 }
 
-                // Pass search value to view to maintain state
+                // Apply availability filter
+                if (isAvailable.HasValue)
+                {
+                    resourcesQuery = resourcesQuery.Where(r => r.IsAvailable == isAvailable.Value);
+                }
+
+                // Maintain filters in the view
                 ViewData["CurrentFilter"] = searchString;
+                ViewData["IsAvailable"] = isAvailable;
 
                 var resources = await resourcesQuery.ToListAsync();
                 return View(resources);
